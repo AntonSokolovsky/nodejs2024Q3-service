@@ -3,9 +3,12 @@ import { User } from 'src/entities/user.entity';
 import { CreateUserDto } from 'src/modules/user/dtos/createUser.dto';
 import { Artist } from 'src/entities/artist.entity';
 import { CreateArtistDto } from 'src/modules/artist/dtos/createArtist.dto';
+import { Track } from 'src/entities/track.entity';
+import { CreateTrackDto } from 'src/modules/track/dtos/createTrack.dto';
 
 const users: User[] = [];
 const artists: Artist[] = [];
+const tracks: Track[] = [];
 
 export async function getAllUsers() {
   return users;
@@ -91,6 +94,49 @@ export async function deleteArtist(id: string): Promise<boolean> {
   const index = artists.findIndex((artist) => artist.id === id);
   if (index >= 0) {
     artists.splice(index, 1);
+    return true;
+  }
+  return false;
+}
+
+export async function getAllTracks() {
+  return tracks;
+}
+export async function createTrack(
+  createTrackDto: CreateTrackDto,
+): Promise<Track> {
+  const newTrack: Track = {
+    id: uuidv4(),
+    // name: createTrackDto.name,
+    // grammy: createTrackDto.grammy,
+    ...createTrackDto,
+  };
+  tracks.push(newTrack);
+  return newTrack;
+}
+
+export async function getTrackById(id: string): Promise<Track | null> {
+  return tracks.find((track) => track.id === id) || null;
+}
+
+export async function updateTrack(
+  id: string,
+  updatedData: Partial<Track>,
+): Promise<Track | null> {
+  const track = tracks.find((track) => track.id === id);
+  if (track) {
+    Object.assign(track, updatedData, {
+      ...updatedData,
+    });
+    return track;
+  }
+  return null;
+}
+
+export async function deleteTrack(id: string): Promise<boolean> {
+  const index = tracks.findIndex((track) => track.id === id);
+  if (index >= 0) {
+    tracks.splice(index, 1);
     return true;
   }
   return false;
