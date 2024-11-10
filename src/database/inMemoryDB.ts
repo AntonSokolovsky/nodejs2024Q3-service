@@ -7,11 +7,17 @@ import { Track } from 'src/entities/track.entity';
 import { CreateTrackDto } from 'src/modules/track/dtos/createTrack.dto';
 import { Album } from 'src/entities/album.entity';
 import { CreateAlbumDto } from 'src/modules/album/dtos/createAlbum.dto';
+import { Favorites } from 'src/entities/favorites.entity';
 
-const users: User[] = [];
-const artists: Artist[] = [];
-const tracks: Track[] = [];
-const albums: Album[] = [];
+export const users: User[] = [];
+export const artists: Artist[] = [];
+export const tracks: Track[] = [];
+export const albums: Album[] = [];
+export const favorites: Favorites = {
+  artists: [],
+  albums: [],
+  tracks: [],
+};
 
 export async function getAllUsers() {
   return users;
