@@ -5,24 +5,23 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { User } from '../../entities/user.entity';
-import { v4 as uuidv4, validate as isUuid } from 'uuid';
+import { validate as isUuid } from 'uuid';
 import { CreateUserDto } from './dtos/createUser.dto';
 import { UpdateUserDto } from './dtos/updateUser.dto';
+import * as db from '../../database/inMemoryDB';
 
 @Injectable()
 export class UserService {
-  private users: User[] = [];
-
-  getAllUsers(): User[] {
-    return this.users;
+  async getAllUsers(): Promise<User[]> {
+    return await db.getAllUsers();
   }
 
-  getUserById(id: string): User | undefined {
+  async getUserById(id: string): Promise<User | null> {
     if (!isUuid(id)) {
       throw new BadRequestException('Invalid user ID format. Expected a UUID.');
     }
 
-    const user = this.users.find((user) => user.id === id);
+    const user = await db.getUserById(id);
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found.`);
     }
@@ -30,29 +29,23 @@ export class UserService {
     return { ...user, password: undefined };
   }
 
-  createUser(createUserDto: CreateUserDto): User {
+  async createUser(createUserDto: CreateUserDto): Promise<User> {
     const { login, password } = createUserDto;
     if (!login || !password) {
       throw new BadRequestException('Login and password are required fields.');
     }
-    const timestamp = Date.now();
-    const newUser: User = {
-      id: uuidv4(),
-      login: createUserDto.login,
-      password: createUserDto.password,
-      version: 1,
-      createdAt: timestamp,
-      updatedAt: timestamp,
-    };
-    this.users.push(newUser);
+    const newUser = await db.createUser(createUserDto);
     return { ...newUser, password: undefined };
   }
 
-  updateUser(id: string, updateUserDto: UpdateUserDto): User | undefined {
+  async updateUser(
+    id: string,
+    updateUserDto: UpdateUserDto,
+  ): Promise<User | undefined> {
     if (!isUuid(id)) {
       throw new BadRequestException('Invalid user ID format. Expected a UUID.');
     }
-    const user = this.users.find((user) => user.id === id);
+    const user = await db.getUserById(id);
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found.`);
     }
@@ -62,35 +55,20 @@ export class UserService {
     ) {
       throw new ForbiddenException('Incorrect old password.');
     }
-    const userIndex = this.users.findIndex((user) => user.id === id);
-    if (userIndex === -1) {
-      throw new NotFoundException(`User with ID ${id} not found`);
-    }
-
-    const existingUser = this.users[userIndex];
-    const updatedUser = {
-      ...existingUser,
+    const updatedUser = await db.updateUser(id, {
+      // ...updateUserDto,
       password: updateUserDto.newPassword,
-      version: existingUser.version + 1,
-      updatedAt: Date.now(),
-    };
-
-    this.users = this.users.map((user) =>
-      user.id === id ? updatedUser : user,
-    );
+    });
     return { ...updatedUser, password: undefined };
   }
 
-  deleteUser(id: string): void {
+  async deleteUser(id: string): Promise<void> {
     if (!isUuid(id)) {
       throw new BadRequestException('Invalid user ID format. Expected a UUID.');
     }
-
-    const index = this.users.findIndex((user) => user.id === id);
-    if (index === -1) {
+    const deleted = await db.deleteUser(id);
+    if (!deleted) {
       throw new NotFoundException(`User with ID ${id} not found.`);
     }
-
-    this.users.splice(index, 1);
   }
 }

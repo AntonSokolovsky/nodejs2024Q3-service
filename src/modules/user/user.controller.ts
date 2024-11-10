@@ -19,32 +19,32 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
-  getAllUsers(): User[] {
-    return this.userService.getAllUsers();
+  async getAllUsers(): Promise<User[]> {
+    return await this.userService.getAllUsers();
   }
 
   @Get(':id')
-  getUserById(@Param('id') id: string): User {
-    return this.userService.getUserById(id);
+  async getUserById(@Param('id') id: string): Promise<User> {
+    return await this.userService.getUserById(id);
   }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  createUser(@Body() createUserDto: CreateUserDto): User {
-    return this.userService.createUser(createUserDto);
+  async createUser(@Body() createUserDto: CreateUserDto): Promise<User> {
+    return await this.userService.createUser(createUserDto);
   }
 
   @Put(':id')
-  updateUser(
+  async updateUser(
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
-  ): User {
-    return this.userService.updateUser(id, updateUserDto);
+  ): Promise<User> {
+    return await this.userService.updateUser(id, updateUserDto);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  deleteUser(@Param('id') id: string): void {
-    this.userService.deleteUser(id);
+  async deleteUser(@Param('id') id: string): Promise<void> {
+    await this.userService.deleteUser(id);
   }
 }
