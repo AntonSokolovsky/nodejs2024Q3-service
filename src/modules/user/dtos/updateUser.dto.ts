@@ -1,4 +1,4 @@
-import { IsNotEmpty, isNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 interface IUpdatePasswordDto {
   oldPassword: string;

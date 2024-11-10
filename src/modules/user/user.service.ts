@@ -56,7 +56,6 @@ export class UserService {
       throw new ForbiddenException('Incorrect old password.');
     }
     const updatedUser = await db.updateUser(id, {
-      // ...updateUserDto,
       password: updateUserDto.newPassword,
     });
     return { ...updatedUser, password: undefined };
