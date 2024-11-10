@@ -5,10 +5,13 @@ import { Artist } from 'src/entities/artist.entity';
 import { CreateArtistDto } from 'src/modules/artist/dtos/createArtist.dto';
 import { Track } from 'src/entities/track.entity';
 import { CreateTrackDto } from 'src/modules/track/dtos/createTrack.dto';
+import { Album } from 'src/entities/album.entity';
+import { CreateAlbumDto } from 'src/modules/album/dtos/createAlbum.dto';
 
 const users: User[] = [];
 const artists: Artist[] = [];
 const tracks: Track[] = [];
+const albums: Album[] = [];
 
 export async function getAllUsers() {
   return users;
@@ -107,8 +110,6 @@ export async function createTrack(
 ): Promise<Track> {
   const newTrack: Track = {
     id: uuidv4(),
-    // name: createTrackDto.name,
-    // grammy: createTrackDto.grammy,
     ...createTrackDto,
   };
   tracks.push(newTrack);
@@ -137,6 +138,47 @@ export async function deleteTrack(id: string): Promise<boolean> {
   const index = tracks.findIndex((track) => track.id === id);
   if (index >= 0) {
     tracks.splice(index, 1);
+    return true;
+  }
+  return false;
+}
+
+export async function getAllAlbums() {
+  return albums;
+}
+export async function createAlbum(
+  createAlbumDto: CreateAlbumDto,
+): Promise<Album> {
+  const newAlbum: Album = {
+    id: uuidv4(),
+    ...createAlbumDto,
+  };
+  albums.push(newAlbum);
+  return newAlbum;
+}
+
+export async function getAlbumById(id: string): Promise<Album | null> {
+  return albums.find((album) => album.id === id) || null;
+}
+
+export async function updateAlbum(
+  id: string,
+  updatedData: Partial<Album>,
+): Promise<Album | null> {
+  const album = albums.find((album) => album.id === id);
+  if (album) {
+    Object.assign(album, updatedData, {
+      ...updatedData,
+    });
+    return album;
+  }
+  return null;
+}
+
+export async function deleteAlbum(id: string): Promise<boolean> {
+  const index = albums.findIndex((album) => album.id === id);
+  if (index >= 0) {
+    albums.splice(index, 1);
     return true;
   }
   return false;
