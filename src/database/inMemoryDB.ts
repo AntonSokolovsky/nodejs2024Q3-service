@@ -195,6 +195,9 @@ export async function deleteAlbum(id: string): Promise<boolean> {
   const index = albums.findIndex((album) => album.id === id);
   if (index >= 0) {
     albums.splice(index, 1);
+    tracks
+      .filter((track) => track.albumId == id)
+      .forEach((track) => (track.albumId = null));
     return true;
   }
   return false;

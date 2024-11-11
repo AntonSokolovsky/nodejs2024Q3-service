@@ -5,39 +5,34 @@ import {
 } from '@nestjs/common';
 import {
   favorites,
-  // artists,
-  // albums,
-  // tracks,
   getArtistById,
   getTrackById,
   getAlbumById,
   getAllAlbums,
   getAllTracks,
+  artists,
+  albums,
+  tracks,
 } from '../../database/inMemoryDB';
 import { CreateFavoriteDto } from './dtos/createFavorite.dto';
-import { FavoritesResponse } from './interfaces/favoritesResponse';
+import { Album } from 'src/entities/album.entity';
+import { Track } from 'src/entities/track.entity';
+import { Artist } from 'src/entities/artist.entity';
 
 @Injectable()
 export class FavoritesService {
-  async getAllFavorites(): Promise<FavoritesResponse> {
-    const favoritesArtists = await Promise.all(
-      favorites.artists.map((artistId) => getArtistById(artistId)),
-    );
-    const favoritesTracks = await Promise.all(
-      favorites.tracks.map((trackId) => getTrackById(trackId)),
-    );
-    const favoritesAlbums = await Promise.all(
-      favorites.albums.map((albumId) => getAlbumById(albumId)),
-    );
+  async getAllFavorites() {
     return {
-      artists: favoritesArtists,
-      albums: favoritesAlbums,
-      tracks: favoritesTracks,
+      artists: artists.filter((artist) =>
+        favorites.artists.includes(artist.id),
+      ),
+      albums: albums.filter((album) => favorites.albums.includes(album.id)),
+      tracks: tracks.filter((track) => favorites.tracks.includes(track.id)),
     };
   }
 
   async addFavorite({ id, type }: CreateFavoriteDto) {
-    const entityExists = this.validateEntityExists(type, id);
+    const entityExists = await this.validateEntityExists(type, id);
     if (!entityExists) {
       throw new UnprocessableEntityException(
         `${type} with id ${id} does not exist`,
@@ -61,19 +56,21 @@ export class FavoritesService {
   }
 
   async validateEntityExists(type: string, id: string) {
+    let result: Artist | Track | Album;
     switch (type) {
       case 'artist':
-        // return artists.some((artist) => artist.id === id);
-        return !!getArtistById(id);
+        result = await getArtistById(id);
+        break;
       case 'album':
-        // return albums.some((album) => album.id === id);
-        return !!getAlbumById(id);
+        result = await getAlbumById(id);
+        break;
       case 'track':
-        // return tracks.some((track) => track.id === id);
-        return !!getTrackById(id);
+        result = await getTrackById(id);
+        break;
       default:
         return false;
     }
+    return !!result;
   }
 
   async handleEntityDeletion(id: string, type: 'artist' | 'album' | 'track') {
