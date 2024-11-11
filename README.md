@@ -8,10 +8,14 @@
 ## Downloading
 
 ```
-git clone {repository URL}
+git clone https://github.com/AntonSokolovsky/nodejs2024Q3-service.git
 ```
 
 ## Installing NPM modules
+
+```
+git checkout develop
+```
 
 ```
 npm install
@@ -19,13 +23,11 @@ npm install
 
 ## Running application
 
+create an .env file based on .env.example specifying the port
+
 ```
 npm start
 ```
-
-After starting the app on port (4000 as default) you can open
-in your browser OpenAPI documentation by typing http://localhost:4000/doc/.
-For more information about OpenAPI/Swagger please visit https://swagger.io/.
 
 ## Testing
 
@@ -41,18 +43,6 @@ To run only one of all test suites
 
 ```
 npm run test -- <path to suite>
-```
-
-To run all test with authorization
-
-```
-npm run test:auth
-```
-
-To run only specific test suite with authorization
-
-```
-npm run test:auth -- <path to suite>
 ```
 
 ### Auto-fix and format
