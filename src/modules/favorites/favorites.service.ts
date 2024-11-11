@@ -5,12 +5,14 @@ import {
 } from '@nestjs/common';
 import {
   favorites,
-  artists,
-  albums,
-  tracks,
+  // artists,
+  // albums,
+  // tracks,
   getArtistById,
   getTrackById,
   getAlbumById,
+  getAllAlbums,
+  getAllTracks,
 } from '../../database/inMemoryDB';
 import { CreateFavoriteDto } from './dtos/createFavorite.dto';
 import { FavoritesResponse } from './interfaces/favoritesResponse';
@@ -61,11 +63,14 @@ export class FavoritesService {
   async validateEntityExists(type: string, id: string) {
     switch (type) {
       case 'artist':
-        return artists.some((artist) => artist.id === id);
+        // return artists.some((artist) => artist.id === id);
+        return !!getArtistById(id);
       case 'album':
-        return albums.some((album) => album.id === id);
+        // return albums.some((album) => album.id === id);
+        return !!getAlbumById(id);
       case 'track':
-        return tracks.some((track) => track.id === id);
+        // return tracks.some((track) => track.id === id);
+        return !!getTrackById(id);
       default:
         return false;
     }
@@ -73,6 +78,8 @@ export class FavoritesService {
 
   async handleEntityDeletion(id: string, type: 'artist' | 'album' | 'track') {
     this.removeFavorite(id, type);
+    const tracks = await getAllTracks();
+    const albums = await getAllAlbums();
     if (type === 'artist') {
       albums.forEach((album) => {
         if (album.artistId === id) album.artistId = null;

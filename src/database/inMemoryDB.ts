@@ -8,16 +8,19 @@ import { CreateTrackDto } from 'src/modules/track/dtos/createTrack.dto';
 import { Album } from 'src/entities/album.entity';
 import { CreateAlbumDto } from 'src/modules/album/dtos/createAlbum.dto';
 import { Favorites } from 'src/entities/favorites.entity';
+import {
+  initialAlbums,
+  initialArtists,
+  initialFavorites,
+  initialTracks,
+  initialUsers,
+} from './fakeInitialDB';
 
-export const users: User[] = [];
-export const artists: Artist[] = [];
-export const tracks: Track[] = [];
-export const albums: Album[] = [];
-export const favorites: Favorites = {
-  artists: [],
-  albums: [],
-  tracks: [],
-};
+export const users: User[] = initialUsers;
+export const artists: Artist[] = initialArtists;
+export const tracks: Track[] = initialTracks;
+export const albums: Album[] = initialAlbums;
+export const favorites: Favorites = initialFavorites;
 
 export async function getAllUsers() {
   return users;
@@ -103,6 +106,13 @@ export async function deleteArtist(id: string): Promise<boolean> {
   const index = artists.findIndex((artist) => artist.id === id);
   if (index >= 0) {
     artists.splice(index, 1);
+    albums
+      .filter((album) => album.artistId == id)
+      .forEach((album) => (album.artistId = null));
+
+    tracks
+      .filter((track) => track.artistId == id)
+      .forEach((track) => (track.artistId = null));
     return true;
   }
   return false;

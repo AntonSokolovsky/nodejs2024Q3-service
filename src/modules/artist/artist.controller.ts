@@ -8,6 +8,7 @@ import {
   Body,
   HttpCode,
   HttpStatus,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { ArtistService } from './artist.service';
 import { CreateArtistDto } from './dtos/createArtist.dto';
@@ -38,7 +39,7 @@ export class ArtistController {
 
   @Put(':id')
   async updateArtist(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() updateArtistDto: UpdateArtistDto,
   ): Promise<Artist> {
     return await this.artistService.updateArtist(id, updateArtistDto);
