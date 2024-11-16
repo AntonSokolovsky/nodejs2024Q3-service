@@ -30,10 +30,6 @@ export class UserService {
   }
 
   async createUser(createUserDto: CreateUserDto): Promise<User> {
-    const { login, password } = createUserDto;
-    if (!login || !password) {
-      throw new BadRequestException('Login and password are required fields.');
-    }
     const newUser = await db.createUser(createUserDto);
     return { ...newUser, password: undefined };
   }

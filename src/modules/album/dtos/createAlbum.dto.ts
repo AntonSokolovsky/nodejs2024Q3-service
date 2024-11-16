@@ -1,7 +1,9 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
+  IsInt,
   IsNotEmpty,
-  IsNumber,
   IsOptional,
+  IsPositive,
   IsString,
   IsUUID,
 } from 'class-validator';
@@ -13,14 +15,31 @@ interface ICreateAlbumDto {
 }
 
 export class CreateAlbumDto implements ICreateAlbumDto {
+  @ApiProperty({
+    example: 'Album',
+    description: 'Album name',
+    required: true,
+  })
   @IsString()
   @IsNotEmpty()
   name: string;
 
-  @IsNumber()
+  @ApiProperty({
+    example: 2024,
+    description: 'Album release year',
+    required: true,
+  })
+  @IsInt()
+  @IsPositive()
   @IsNotEmpty()
   year: number;
 
+  @ApiProperty({
+    example: 'c1b75b56-e8a3-4a69-993f-9b11f2c60f4d',
+    description: 'Artist id',
+    required: false,
+    nullable: true,
+  })
   @IsUUID()
   @IsOptional()
   artistId: string | null;
