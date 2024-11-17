@@ -1,0 +1,10 @@
+# Ignore unnecessary files
+node_modules
+dist
+.env
+*.log
+*.ts
+.git
+.gitignore
+Dockerfile
+docker-compose.yml
