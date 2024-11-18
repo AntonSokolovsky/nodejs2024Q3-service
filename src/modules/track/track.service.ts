@@ -7,12 +7,13 @@ import { Track } from '../../entities/track.entity';
 import { validate as isUuid } from 'uuid';
 import { CreateTrackDto } from './dtos/createTrack.dto';
 import { UpdateTrackDto } from './dtos/updateTrack.dto';
-import * as db from '../../database/inMemoryDB';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class TrackService {
+  constructor(private prisma: PrismaService) {}
   async getAllTracks(): Promise<Track[]> {
-    return await db.getAllTracks();
+    return await this.prisma.track.findMany();
   }
 
   async getTrackById(id: string): Promise<Track | null> {
@@ -22,7 +23,7 @@ export class TrackService {
       );
     }
 
-    const track = await db.getTrackById(id);
+    const track = await this.prisma.track.findUnique({ where: { id } });
     if (!track) {
       throw new NotFoundException(`Track with ID ${id} not found.`);
     }
@@ -35,7 +36,7 @@ export class TrackService {
     if (!name || !duration) {
       throw new BadRequestException('Name and duration are required fields.');
     }
-    const newTrack = await db.createTrack(createTrackDto);
+    const newTrack = await this.prisma.track.create({ data: createTrackDto });
     return newTrack;
   }
 
@@ -48,15 +49,14 @@ export class TrackService {
         'Invalid track ID format. Expected a UUID.',
       );
     }
-    const track = await db.getTrackById(id);
+    const track = await this.prisma.track.findUnique({ where: { id } });
     if (!track) {
       throw new NotFoundException(`Track with ID ${id} not found.`);
     }
 
-    const updatedTrack = await db.updateTrack(id, {
-      //   name: updateTrackDto.name,
-      //   grammy: updateTrackDto.grammy,
-      ...updateTrackDto,
+    const updatedTrack = await this.prisma.track.update({
+      where: { id },
+      data: updateTrackDto,
     });
     return updatedTrack;
   }
@@ -67,9 +67,11 @@ export class TrackService {
         'Invalid track ID format. Expected a UUID.',
       );
     }
-    const deleted = await db.deleteTrack(id);
-    if (!deleted) {
+    const track = await this.prisma.track.findUnique({ where: { id } });
+    if (!track) {
       throw new NotFoundException(`Track with ID ${id} not found.`);
+    } else {
+      await this.prisma.track.delete({ where: { id } });
     }
   }
 }

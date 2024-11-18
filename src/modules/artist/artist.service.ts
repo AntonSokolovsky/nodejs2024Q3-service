@@ -7,12 +7,13 @@ import { Artist } from '../../entities/artist.entity';
 import { validate as isUuid } from 'uuid';
 import { CreateArtistDto } from './dtos/createArtist.dto';
 import { UpdateArtistDto } from './dtos/updateArtist.dto';
-import * as db from '../../database/inMemoryDB';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class ArtistService {
+  constructor(private prisma: PrismaService) {}
   async getAllArtists(): Promise<Artist[]> {
-    return await db.getAllArtists();
+    return await this.prisma.artist.findMany();
   }
 
   async getArtistById(id: string): Promise<Artist | null> {
@@ -22,7 +23,7 @@ export class ArtistService {
       );
     }
 
-    const artist = await db.getArtistById(id);
+    const artist = await this.prisma.artist.findUnique({ where: { id } });
     if (!artist) {
       throw new NotFoundException(`Artist with ID ${id} not found.`);
     }
@@ -35,7 +36,9 @@ export class ArtistService {
     if (!name || !grammy) {
       throw new BadRequestException('Name and grammy are required fields.');
     }
-    const newArtist = await db.createArtist(createArtistDto);
+    const newArtist = await this.prisma.artist.create({
+      data: createArtistDto,
+    });
     return newArtist;
   }
 
@@ -48,14 +51,14 @@ export class ArtistService {
         'Invalid artist ID format. Expected a UUID.',
       );
     }
-    const artist = await db.getArtistById(id);
+    const artist = await this.prisma.artist.findUnique({ where: { id } });
     if (!artist) {
       throw new NotFoundException(`Artist with ID ${id} not found.`);
     }
 
-    const updatedArtist = await db.updateArtist(id, {
-      name: updateArtistDto.name,
-      grammy: updateArtistDto.grammy,
+    const updatedArtist = await this.prisma.artist.update({
+      where: { id },
+      data: updateArtistDto,
     });
     return updatedArtist;
   }
@@ -66,9 +69,11 @@ export class ArtistService {
         'Invalid artist ID format. Expected a UUID.',
       );
     }
-    const deleted = await db.deleteArtist(id);
-    if (!deleted) {
+    const artist = await this.prisma.artist.findUnique({ where: { id } });
+    if (!artist) {
       throw new NotFoundException(`Artist with ID ${id} not found.`);
+    } else {
+      await this.prisma.artist.delete({ where: { id } });
     }
   }
 }
