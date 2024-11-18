@@ -4,44 +4,39 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { User } from '../../entities/user.entity';
 import { validate as isUuid } from 'uuid';
 import { CreateUserDto } from './dtos/createUser.dto';
 import { UpdateUserDto } from './dtos/updateUser.dto';
-import * as db from '../../database/inMemoryDB';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class UserService {
-  async getAllUsers(): Promise<User[]> {
-    return await db.getAllUsers();
+  constructor(private readonly prisma: PrismaService) {}
+  async getAllUsers() {
+    return await this.prisma.user.findMany();
   }
 
-  async getUserById(id: string): Promise<User | null> {
+  async getUserById(id: string) {
     if (!isUuid(id)) {
       throw new BadRequestException('Invalid user ID format. Expected a UUID.');
     }
 
-    const user = await db.getUserById(id);
-    if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found.`);
-    }
+    const user = await this.prisma.user.findUnique({ where: { id } });
+    if (!user) throw new NotFoundException('User not found');
 
     return { ...user, password: undefined };
   }
 
-  async createUser(createUserDto: CreateUserDto): Promise<User> {
-    const newUser = await db.createUser(createUserDto);
+  async createUser(createUserDto: CreateUserDto) {
+    const newUser = this.prisma.user.create({ data: createUserDto });
     return { ...newUser, password: undefined };
   }
 
-  async updateUser(
-    id: string,
-    updateUserDto: UpdateUserDto,
-  ): Promise<User | undefined> {
+  async updateUser(id: string, updateUserDto: UpdateUserDto) {
     if (!isUuid(id)) {
       throw new BadRequestException('Invalid user ID format. Expected a UUID.');
     }
-    const user = await db.getUserById(id);
+    const user = await this.prisma.user.findUnique({ where: { id } });
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found.`);
     }
@@ -51,8 +46,9 @@ export class UserService {
     ) {
       throw new ForbiddenException('Incorrect old password.');
     }
-    const updatedUser = await db.updateUser(id, {
-      password: updateUserDto.newPassword,
+    const updatedUser = await this.prisma.user.update({
+      where: { id },
+      data: updateUserDto,
     });
     return { ...updatedUser, password: undefined };
   }
@@ -61,9 +57,11 @@ export class UserService {
     if (!isUuid(id)) {
       throw new BadRequestException('Invalid user ID format. Expected a UUID.');
     }
-    const deleted = await db.deleteUser(id);
-    if (!deleted) {
+    const user = await this.prisma.user.findUnique({ where: { id } });
+    if (!user) {
       throw new NotFoundException(`User with ID ${id} not found.`);
+    } else {
+      await this.prisma.user.delete({ where: { id } });
     }
   }
 }

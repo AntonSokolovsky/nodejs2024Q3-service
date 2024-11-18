@@ -12,7 +12,6 @@ import {
 import { UserService } from './user.service';
 import { CreateUserDto } from './dtos/createUser.dto';
 import { UpdateUserDto } from './dtos/updateUser.dto';
-import { User } from '../../entities/user.entity';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Users')
@@ -23,7 +22,7 @@ export class UserController {
   @ApiOperation({ summary: 'Get all Users' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Successful operation' })
   @Get()
-  async getAllUsers(): Promise<User[]> {
+  async getAllUsers() {
     return await this.userService.getAllUsers();
   }
 
@@ -42,7 +41,7 @@ export class UserController {
     description: 'User not found',
   })
   @Get(':id')
-  async getUserById(@Param('id') id: string): Promise<User> {
+  async getUserById(@Param('id') id: string) {
     return await this.userService.getUserById(id);
   }
 
@@ -57,7 +56,7 @@ export class UserController {
   })
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async createUser(@Body() createUserDto: CreateUserDto): Promise<User> {
+  async createUser(@Body() createUserDto: CreateUserDto) {
     return await this.userService.createUser(createUserDto);
   }
 
@@ -90,7 +89,7 @@ export class UserController {
   async updateUser(
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
-  ): Promise<User> {
+  ) {
     return await this.userService.updateUser(id, updateUserDto);
   }
 
