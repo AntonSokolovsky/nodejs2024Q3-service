@@ -51,7 +51,7 @@ export class FavoritesController {
     @Param('type') type: 'artist' | 'album' | 'track',
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
   ) {
-    return await this.favoritesService.addFavorite({ id, type });
+    return await this.favoritesService.addEntityToFavorites({ id, type });
   }
 
   @ApiOperation({
