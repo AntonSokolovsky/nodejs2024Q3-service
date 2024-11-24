@@ -1,18 +1,20 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { ConsoleLogger, Injectable, LogLevel } from '@nestjs/common';
 import { defaultLogContext, TitleLog } from './constants';
 import { dirname, resolve } from 'path';
 import { mkdir } from 'fs/promises';
 import { createWriteStream, WriteStream } from 'fs';
 
 @Injectable()
-export class LoggingService extends Logger {
+export class LoggingService extends ConsoleLogger {
   private logFileStream: WriteStream | null = null;
   private pathFolder = '../../logs';
   private pathFile = 'app.log';
+  private logLevel: LogLevel;
 
   constructor() {
     super();
     this.initializeLogFile();
+    this.logLevel = (process.env.LOG_LEVEL as LogLevel) || 'log';
   }
 
   private async initializeLogFile() {
@@ -70,5 +72,9 @@ export class LoggingService extends Logger {
         context ?? defaultLogContext
       }] ${message}`,
     );
+  }
+  isLevelEnabled(level: LogLevel): boolean {
+    const levels: LogLevel[] = ['log', 'error', 'warn', 'debug', 'verbose'];
+    return levels.indexOf(level) <= levels.indexOf(this.logLevel);
   }
 }
