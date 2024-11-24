@@ -12,6 +12,7 @@ RUN npm install
 
 # Copy application source code
 COPY . .
+RUN npx prisma generate
 
 # Build the application
 RUN npm run build
@@ -20,4 +21,4 @@ RUN npm run build
 EXPOSE 4000
 
 # Start the application
-CMD ["npm", "run", "start:prod"]
+CMD ["npm", "run", "start:migrate:prod"]

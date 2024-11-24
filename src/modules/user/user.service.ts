@@ -28,8 +28,13 @@ export class UserService {
   }
 
   async createUser(createUserDto: CreateUserDto) {
-    const newUser = this.prisma.user.create({ data: createUserDto });
-    return { ...newUser, password: undefined };
+    const newUser = await this.prisma.user.create({ data: createUserDto });
+    const userResponse = {
+      ...newUser,
+      createdAt: +newUser.createdAt,
+      updatedAt: +newUser.updatedAt,
+    };
+    return { ...userResponse, password: undefined };
   }
 
   async updateUser(id: string, updateUserDto: UpdateUserDto) {
@@ -48,9 +53,14 @@ export class UserService {
     }
     const updatedUser = await this.prisma.user.update({
       where: { id },
-      data: updateUserDto,
+      data: { password: updateUserDto.newPassword, version: ++user.version },
     });
-    return { ...updatedUser, password: undefined };
+    const userResponse = {
+      ...updatedUser,
+      createdAt: +updatedUser.createdAt,
+      updatedAt: +updatedUser.updatedAt,
+    };
+    return { ...userResponse, password: undefined };
   }
 
   async deleteUser(id: string): Promise<void> {

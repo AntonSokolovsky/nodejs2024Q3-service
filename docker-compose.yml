@@ -33,9 +33,9 @@ services:
     container_name: ${DB_HOST}
     image: image-postgres
     environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
     command:
       - postgres
       - -c
@@ -44,7 +44,7 @@ services:
       - postgres-data:/var/lib/postgresql/data
     ports:
       - ${DB_PORT}:${DB_PORT}
-    restart: always
+    restart: on-failure
     networks:
       - app-network
       
