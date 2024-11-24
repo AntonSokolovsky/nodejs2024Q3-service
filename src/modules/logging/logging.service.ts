@@ -1,32 +1,45 @@
 import { ConsoleLogger, Injectable, LogLevel } from '@nestjs/common';
 import { defaultLogContext, TitleLog } from './constants';
-import { dirname, resolve } from 'path';
+import { resolve } from 'path';
 import { mkdir } from 'fs/promises';
-import { createWriteStream, WriteStream } from 'fs';
+import { createStream, RotatingFileStream } from 'rotating-file-stream';
 
 @Injectable()
 export class LoggingService extends ConsoleLogger {
-  private logFileStream: WriteStream | null = null;
   private pathFolder = '../../logs';
-  private pathFile = 'app.log';
+  private fileAppLogName = 'app.log';
+  private fileErrorLogName = 'error.log';
   private logLevel: LogLevel;
+  private logStream: RotatingFileStream;
+  private errorLogStream: RotatingFileStream;
+  private maxLogSize: string = process.env.MAX_LOG_SIZE || '10M';
 
   constructor() {
     super();
-    this.initializeLogFile();
+    this.initializeLog();
     this.logLevel = (process.env.LOG_LEVEL as LogLevel) || 'log';
   }
 
-  private async initializeLogFile() {
-    const logFilePath = resolve(__dirname, this.pathFolder, this.pathFile);
-    mkdir(dirname(logFilePath), { recursive: true });
-    this.logFileStream = createWriteStream(logFilePath, { flags: 'a' });
+  private async initializeLog() {
+    const logDir = resolve(__dirname, this.pathFolder);
+    mkdir(logDir, { recursive: true });
+
+    this.logStream = createStream(this.fileAppLogName, {
+      size: this.maxLogSize,
+      interval: '1d',
+      path: logDir,
+    });
+
+    this.errorLogStream = createStream(this.fileErrorLogName, {
+      size: this.maxLogSize,
+      interval: '1d',
+      path: logDir,
+    });
   }
 
-  private async writeToLogFile(message: string) {
-    if (this.logFileStream) {
-      this.logFileStream.write(message + '\n');
-    }
+  private async writeToLogFile(message: string, isError = false) {
+    const stream = isError ? this.errorLogStream : this.logStream;
+    stream.write(message + '\n');
   }
 
   async log(message: string, context?: string) {
