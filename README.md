@@ -14,7 +14,7 @@ git clone https://github.com/AntonSokolovsky/nodejs2024Q3-service.git
 ## Installing NPM modules
 
 ```
-git checkout develop
+git checkout feat/containerization_and_database
 ```
 
 ```
@@ -26,7 +26,7 @@ npm install
 create an .env file based on .env.example specifying the port
 
 ```
-npm start
+docker-compose up
 ```
 
 ## Testing
