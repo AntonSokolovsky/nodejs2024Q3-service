@@ -2,11 +2,25 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { LoggingService } from './modules/logging/logging.service';
+import { HttpExceptionFilter } from './modules/logging/http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+
+  const logger = app.get(LoggingService);
+  app.useGlobalFilters(new HttpExceptionFilter(logger));
+  app.useLogger(logger);
+
+  process.on('uncaughtException', (error: Error) => {
+    console.error('Uncaught Exception:', error);
+  });
+
+  process.on('unhandledRejection', (reason: any) => {
+    console.error('Unhandled Rejection:', reason);
+  });
 
   const config = new DocumentBuilder()
     .setTitle('Home Library Service')

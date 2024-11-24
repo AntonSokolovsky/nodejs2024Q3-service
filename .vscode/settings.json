@@ -1,3 +1,13 @@
 {
-  "cSpell.words": ["datasource", "dtos", "nestjs", "uuidv"]
+  "cSpell.words": [
+    "datasource",
+    "dockerhub",
+    "dtos",
+    "favs",
+    "mydatabase",
+    "mypassword",
+    "myuser",
+    "nestjs",
+    "uuidv"
+  ]
 }
