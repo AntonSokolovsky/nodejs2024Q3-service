@@ -8,14 +8,17 @@ import {
   Body,
   HttpCode,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 import { AlbumService } from './album.service';
 import { CreateAlbumDto } from './dtos/createAlbum.dto';
 import { UpdateAlbumDto } from './dtos/updateAlbum.dto';
 import { Album } from '../../entities/album.entity';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('Albums')
+@UseGuards(AuthGuard('jwt'))
 @Controller('album')
 export class AlbumController {
   constructor(private readonly albumService: AlbumService) {}

@@ -9,14 +9,17 @@ import {
   HttpCode,
   HttpStatus,
   ParseUUIDPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { ArtistService } from './artist.service';
 import { CreateArtistDto } from './dtos/createArtist.dto';
 import { UpdateArtistDto } from './dtos/updateArtist.dto';
 import { Artist } from '../../entities/artist.entity';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('Artists')
+@UseGuards(AuthGuard('jwt'))
 @Controller('artist')
 export class ArtistController {
   constructor(private readonly artistService: ArtistService) {}

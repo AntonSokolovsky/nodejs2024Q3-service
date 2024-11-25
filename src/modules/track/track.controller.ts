@@ -8,14 +8,17 @@ import {
   Body,
   HttpCode,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 import { TrackService } from './track.service';
 import { CreateTrackDto } from './dtos/createTrack.dto';
 import { UpdateTrackDto } from './dtos/updateTrack.dto';
 import { Track } from '../../entities/track.entity';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('Tracks')
+@UseGuards(AuthGuard('jwt'))
 @Controller('track')
 export class TrackController {
   constructor(private readonly trackService: TrackService) {}
