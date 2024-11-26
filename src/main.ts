@@ -4,7 +4,6 @@ import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { LoggingService } from './modules/logging/logging.service';
 import { HttpExceptionFilter } from './modules/logging/http-exception.filter';
-import { JwtMiddleware } from './modules/auth/jwt.middleware';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -36,7 +35,7 @@ async function bootstrap() {
 
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('doc', app, documentFactory());
-  app.use(new JwtMiddleware().use);
+
   await app.listen(process.env.PORT || 4000);
 }
 bootstrap();
