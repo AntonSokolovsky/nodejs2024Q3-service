@@ -14,7 +14,7 @@ git clone https://github.com/AntonSokolovsky/nodejs2024Q3-service.git
 ## Installing NPM modules
 
 ```
-git checkout feat/containerization_and_database
+git checkout feat/logging_and_authentication
 ```
 
 ```
@@ -33,16 +33,16 @@ docker-compose up
 
 After application running open new terminal and enter:
 
-To run all tests without authorization
+To run all tests with authorization
 
 ```
-npm run test
+npm run test:auth
 ```
 
-To run only one of all test suites
+To run the test of refresh token
 
 ```
-npm run test -- <path to suite>
+npm run test:refresh
 ```
 
 ### Auto-fix and format
