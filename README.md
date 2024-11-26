@@ -8,10 +8,14 @@
 ## Downloading
 
 ```
-git clone {repository URL}
+git clone https://github.com/AntonSokolovsky/nodejs2024Q3-service.git
 ```
 
 ## Installing NPM modules
+
+```
+git checkout feat/logging_and_authentication
+```
 
 ```
 npm install
@@ -19,40 +23,26 @@ npm install
 
 ## Running application
 
-```
-npm start
-```
+create an .env file based on .env.example specifying the port
 
-After starting the app on port (4000 as default) you can open
-in your browser OpenAPI documentation by typing http://localhost:4000/doc/.
-For more information about OpenAPI/Swagger please visit https://swagger.io/.
+```
+docker-compose up
+```
 
 ## Testing
 
 After application running open new terminal and enter:
 
-To run all tests without authorization
-
-```
-npm run test
-```
-
-To run only one of all test suites
-
-```
-npm run test -- <path to suite>
-```
-
-To run all test with authorization
+To run all tests with authorization
 
 ```
 npm run test:auth
 ```
 
-To run only specific test suite with authorization
+To run the test of refresh token
 
 ```
-npm run test:auth -- <path to suite>
+npm run test:refresh
 ```
 
 ### Auto-fix and format
